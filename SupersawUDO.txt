@@ -1,0 +1,36 @@
+opcode supersaw, a, kkkk
+kcps, kamp, kdetune, kphase  xin
+
+;Skalerer frekvensen til de forskjellige oscilatorene ulikt
+kdetune1 = (kdetune-1)/2+1
+kdetune2 = (kdetune-1)/4+1
+kdetune3 = 1-(kdetune-1)
+
+
+;Skalerer hver vco2 sin fase ulikt, for å minimere utfasing
+kphase1 = kphase *0.3
+kphase2 = kphase *0.5
+kphase3 = kphase *0.75
+kphase4 = kphase
+
+;"Hovedoscilator" som har urørt fase og frekvens
+aMainOscil  vco2 p5,   p4
+
+
+                 ;kamp,  Frekvens og skalering, Sagtann,    kpw,    fase,   inyx
+                 
+;kpw er satt til ett tilfeldig tall fordi verdien ignoreres når sagtann er valgt
+;inyx er satt til 0.25 fordi manualen sier at dette kan resultere i en "feitere" lyd (http://www.csounds.com/manual/html/vco2.html)                
+                 
+aOscil1     vco2 kamp,   kcps*kdetune1,         0,       0.3,    kphase1, 0.25
+aOscil2     vco2 kamp,   kcps*kdetune2,      0,       0.3,    kphase2, 0.25
+aOscil3     vco2 kamp,   kcps*kdetune3,     0,       0.3,    kphase3, 0.25
+aOscil4     vco2 kamp,   kcps*kdetune,             0,       0.3,    kphase4, 0.25
+
+
+;aOut = aMainOscil + aOscil1 + aOscil2 + aOscil3 + aOscil4
+aOut =  aOscil1 + aOscil2 + aOscil3 + aOscil4
+
+xout aOut
+
+endop
