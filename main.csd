@@ -120,9 +120,9 @@ instr LFO
 ;LFOene globale variabler som alltid er på, slik at man kan rute de hvor man vil, uavhengig av andre parameterene
 
 ;LFO 1-------------------------
-kwave chnget "lfo1wave"
-krate1 chnget "lfo1rate"
-kdepth1 chnget"lfo1vol"
+kwave cabbageGetValue "lfo1wave"
+krate1 cabbageGetValue "lfo1rate"
+kdepth1 cabbageGetValue"lfo1vol"
 
 ;Gjør at verdien til waveform knoben tilsvarer ønsked bølgeform til LFO opcoden
 if kwave == 1 then 
@@ -135,7 +135,7 @@ elseif kwave == 4 then
    kwave1 = 5 ;Saw, unipolar
 endif
 
-kcheck1 changed kwave1, chnget:k("IS_PLAYING"), chnget:k("IS_RECORDING") ;lfo opcoden krever en i-variable, reiniter hver gang kwave endres for å oppdatere, 
+kcheck1 changed kwave1, cabbageGetValue:k("IS_PLAYING"), cabbageGetValue:k("IS_RECORDING") ;lfo opcoden krever en i-variable, reiniter hver gang kwave endres for å oppdatere, 
 if kcheck1 == 1 then                                                     ;Reiniter også hver gang HOST DAW spiller av/tar opp, av praktiske årsaker med tanke på tempo
     reinit UPDATE
 endif
@@ -155,9 +155,9 @@ rireturn ;Stopper init fasen sånn at den ikke initer lfo 2 hver gang man endrer
 
 
 ;LFO 2--------------------------
-kwave2 chnget "lfo2wave"
-krate2 chnget "lfo2rate"
-kdepth2 chnget"lfo2vol"
+kwave2 cabbageGetValue "lfo2wave"
+krate2 cabbageGetValue "lfo2rate"
+kdepth2 cabbageGetValue"lfo2vol"
 
 
 ;Gjør at verdien til waveform knoben tilsvarer ønsked bølgeform til LFO opcoden
@@ -171,7 +171,7 @@ elseif kwave2 == 4 then
    kwave3 = 5 ;Saw, unipolar
 endif
 
-kcheck2 changed kwave3, chnget:k("IS_PLAYING"), chnget:k("IS_RECORDING")
+kcheck2 changed kwave3, cabbageGetValue:k("IS_PLAYING"), cabbageGetValue:k("IS_RECORDING")
 if kcheck2 == 1 then
     reinit UPDATE2 
 endif
@@ -191,14 +191,14 @@ endin
 
 
 instr polymonocheck ;Sjekker om man endrer fra poly til mono/legato.
-gkCheck chnget "switch"
+gkCheck cabbageGetValue "switch"
 if gkCheck == 0 then
     ktrigger = 1
     schedkwhen ktrigger, 0, 1, 2, 0, 360000   ;Starter instr 2(Legato instrumentet)
     gkRelease = 0 ;Se kommentar på "gkRelease init 0" øverst i koden.
  endif
 if gkCheck == 1 then
-    gkRelease chnget "amprel" 
+    gkRelease cabbageGetValue "amprel" 
 endif
 endin
 
@@ -211,7 +211,7 @@ gkPitch = p4
 gkAmp = p5
 
                     
-gkCutEnv linseg 0, chnget:i("filtattack"), 1 ;Envelope for filter sweep. Bruker linseg ikke line fordi line fortsetter å stige hvis noten er holdt.
+gkCutEnv linseg 0, cabbageGetValue:i("filtattack"), 1 ;Envelope for filter sweep. Bruker linseg ikke line fordi line fortsetter å stige hvis noten er holdt.
                                              ;Er utenfor polytoggle-if statementet slik at Legato instrumentet også kan ha
                                              ;sweep (Litt buggy på legato modus foreløpig, må la sweepen fullføre før man spiller neste tone, hvis ikke kommer det en klikkelyd)
 
@@ -221,7 +221,7 @@ if gkCheck == 1 then ;HELE INSTRUMENTET er i dette if statementet
     
     ;Amp Envelope
 irelease = i(gkRelease)
-kAmpEnv madsr chnget:i("ampatt"), chnget:i("ampdec"), chnget:i("ampsus"), irelease
+kAmpEnv madsr cabbageGetValue:i("ampatt"), cabbageGetValue:i("ampdec"), cabbageGetValue:i("ampsus"), irelease
 
 
     ;Waveform velging
@@ -229,22 +229,22 @@ iSelect1 = i(gkSelect1)
 iSelect2 = i(gkSelect2)
 
     ;PITCH OG VIBRATO
-kpitch1 chnget "oscil1ptch"
-kpitch2 chnget "oscil2ptch"
+kpitch1 cabbageGetValue "oscil1ptch"
+kpitch2 cabbageGetValue "oscil2ptch"
 
 
     ;Vibrato
-if chnget:k("ptch1LFO") == 0 then
+if cabbageGetValue:k("ptch1LFO") == 0 then
      kvibLFO1 = 1
-elseif chnget:k("ptch1LFO") == 1 then
-     kLfoAmp1 = p4 * chnget:k("vibdepth1")
+elseif cabbageGetValue:k("ptch1LFO") == 1 then
+     kLfoAmp1 = p4 * cabbageGetValue:k("vibdepth1")
      kvibLFO1 oscil kLfoAmp1, 8
 endif
 
-if chnget:k("ptch2LFO") == 0 then
+if cabbageGetValue:k("ptch2LFO") == 0 then
      kvibLFO2 = 1
-elseif chnget:k("ptch2LFO") == 1 then
-     kLfoAmp2 = p4 * chnget:k("vibdepth2")
+elseif cabbageGetValue:k("ptch2LFO") == 1 then
+     kLfoAmp2 = p4 * cabbageGetValue:k("vibdepth2")
      kvibLFO2 oscil kLfoAmp2, 8
 endif
 
@@ -264,24 +264,24 @@ endif
 
 
     ;Volum LFO 
-koscilvol1 chnget "oscil1vol"
-koscilvol2 chnget "oscil2vol"
+koscilvol1 cabbageGetValue "oscil1vol"
+koscilvol2 cabbageGetValue "oscil2vol"
 
-if chnget:k("vol1LFO") == 2 then
-    koscilvol1 = gkLfo1*chnget:k("oscil1vol")
-elseif chnget:k("vol1LFO") == 3 then
-    koscilvol1 = gkLfo2*chnget:k("oscil1vol")
+if cabbageGetValue:k("vol1LFO") == 2 then
+    koscilvol1 = gkLfo1*cabbageGetValue:k("oscil1vol")
+elseif cabbageGetValue:k("vol1LFO") == 3 then
+    koscilvol1 = gkLfo2*cabbageGetValue:k("oscil1vol")
 endif
 
-if chnget:k("vol2LFO") == 2 then
-    koscilvol2 = gkLfo1 * chnget:k("oscil2vol")
-elseif chnget:k("vol2LFO") == 3 then
-    koscilvol2 = gkLfo2 * chnget:k("oscil2vol")
+if cabbageGetValue:k("vol2LFO") == 2 then
+    koscilvol2 = gkLfo1 * cabbageGetValue:k("oscil2vol")
+elseif cabbageGetValue:k("vol2LFO") == 3 then
+    koscilvol2 = gkLfo2 * cabbageGetValue:k("oscil2vol")
 endif
 
     ;Panning
-kpan1 port chnget:k("osc1pan"), 0.01
-kpan2 port chnget:k("osc2pan"), 0.01
+kpan1 port cabbageGetValue:k("osc1pan"), 0.01
+kpan2 port cabbageGetValue:k("osc2pan"), 0.01
 
 a1, a2 pan2 aosc1*koscilvol1, kpan1
 a3, a4 pan2 aosc2*koscilvol2, kpan2
@@ -331,8 +331,8 @@ kampraw init 0
 kvel init 0
 kvelreset init 0
 
-kvibdepth1 chnget "vibdepth1"
-kvibdepth2 chnget "vibdepth2"
+kvibdepth1 cabbageGetValue "vibdepth1"
+kvibdepth2 cabbageGetValue "vibdepth2"
                                                         
 ;-------------LEGATO SYSTEM-------------------
                 
@@ -348,11 +348,11 @@ endif
 
 if kturnon != 0 then 
         kampraw = 0.5 * kvel
-        kenvramp = 20-(chnget:k("monoatt")*20) ;Høyere = raskere, tonek koden er eksponensiell så her har jeg skalert litt slik at envelopen hadde rekkevidden jeg ønsket
+        kenvramp = 20-(cabbageGetValue:k("monoatt")*20) ;Høyere = raskere, tonek koden er eksponensiell så her har jeg skalert litt slik at envelopen hadde rekkevidden jeg ønsket
         kvelreset = 0 ;Gjør klar for neste legatoløp med tanke på amplitude/velocity systemet.
     else
         kampraw = 0
-        kenvramp = 20-(chnget:k("monorel")*20) ;Samme som over
+        kenvramp = 20-(cabbageGetValue:k("monorel")*20) ;Samme som over
 endif
 kamp tonek kampraw, kenvramp 
 
@@ -364,7 +364,7 @@ gkInitcheck = giInitcheck ;Sjekker om det er første tone i ett legato-løp (Må
 if gkInitcheck == 1 then ;En av de viktigste forbedringene jeg gjorde på Jim Aikin sin kode. Hvis det er første tonen i ett løp, så starter man rett på den tonen,
     kpitchglide = 1000   ;Jim Aikin sin variant hadde legato selv om tonene ikke hadde "overlap". Dette var veldig uønsket for mitt bruksområdet.
 elseif gkInitcheck > 1 then
-    kpitchglide = chnget:k("legtime") ;Jo lavere tall, jo tregere legato.
+    kpitchglide = cabbageGetValue:k("legtime") ;Jo lavere tall, jo tregere legato.
     gkCutEnv = 1 ;Ignorerer filtersweep hvis det ikke er første tone i ett legatoløp, altså filter sweep gjelder bare første tone
 endif
 
@@ -381,19 +381,19 @@ endif
 
 
     ;Vibrato LFO
-kpitch1 chnget "oscil1ptch"
-kpitch2 chnget "oscil2ptch"
+kpitch1 cabbageGetValue "oscil1ptch"
+kpitch2 cabbageGetValue "oscil2ptch"
 
-if chnget:k("ptch1LFO") == 0 then
+if cabbageGetValue:k("ptch1LFO") == 0 then
      kvibLFO1 = 1
-elseif chnget:k("ptch1LFO") == 1 then
+elseif cabbageGetValue:k("ptch1LFO") == 1 then
      kLfoAmp1 = gkPitch * kvibdepth1
      kvibLFO1 oscil kLfoAmp1, 8
 endif
 
-if chnget:k("ptch2LFO") == 0 then
+if cabbageGetValue:k("ptch2LFO") == 0 then
      kvibLFO2 = 1
-elseif chnget:k("ptch2LFO") == 1 then
+elseif cabbageGetValue:k("ptch2LFO") == 1 then
      kLfoAmp2 = gkPitch * kvibdepth2
      kvibLFO2 oscil kLfoAmp2, 8
 endif
@@ -424,24 +424,24 @@ rireturn
 
 
     ;Volum LFO
-koscilvol1 chnget "oscil1vol"
-koscilvol2 chnget "oscil2vol"
+koscilvol1 cabbageGetValue "oscil1vol"
+koscilvol2 cabbageGetValue "oscil2vol"
 
-if chnget:k("vol1LFO") == 2 then
-    koscilvol1 = gkLfo1*chnget:k("oscil1vol")
-elseif chnget:k("vol1LFO") == 3 then
-    koscilvol1 = gkLfo2*chnget:k("oscil1vol")
+if cabbageGetValue:k("vol1LFO") == 2 then
+    koscilvol1 = gkLfo1*cabbageGetValue:k("oscil1vol")
+elseif cabbageGetValue:k("vol1LFO") == 3 then
+    koscilvol1 = gkLfo2*cabbageGetValue:k("oscil1vol")
 endif
 
-if chnget:k("vol2LFO") == 2 then
-    koscilvol2 = gkLfo1 * chnget:k("oscil2vol")
-elseif chnget:k("vol2LFO") == 3 then
-    koscilvol2 = gkLfo2 * chnget:k("oscil2vol")
+if cabbageGetValue:k("vol2LFO") == 2 then
+    koscilvol2 = gkLfo1 * cabbageGetValue:k("oscil2vol")
+elseif cabbageGetValue:k("vol2LFO") == 3 then
+    koscilvol2 = gkLfo2 * cabbageGetValue:k("oscil2vol")
 endif
 
     ;Panning
-kpan1 port chnget:k("osc1pan"), 0.01
-kpan2 port chnget:k("osc2pan"), 0.01
+kpan1 port cabbageGetValue:k("osc1pan"), 0.01
+kpan2 port cabbageGetValue:k("osc2pan"), 0.01
 
 a1, a2 pan2 aosc1*koscilvol1, kpan1
 a3, a4 pan2 aosc2*koscilvol2, kpan2
@@ -461,10 +461,10 @@ endin
 instr FILTER
 
 ;LFO Ruting
-gkLfo1 += 1-chnget:k("lfo1vol");Gjør at hvis "Depth" er satt på null, så er "dry" signalet urørt, uten denne så er det ikke lyd hvis lfovol/depth er på 0
-gkLfo2 += 1-chnget:k("lfo2vol")
+gkLfo1 += 1-cabbageGetValue:k("lfo1vol");Gjør at hvis "Depth" er satt på null, så er "dry" signalet urørt, uten denne så er det ikke lyd hvis lfovol/depth er på 0
+gkLfo2 += 1-cabbageGetValue:k("lfo2vol")
 
-kCombobox chnget "lfocutoff" ;Velg om du skal bruke LFO, og hvilken.
+kCombobox cabbageGetValue "lfocutoff" ;Velg om du skal bruke LFO, og hvilken.
 if kCombobox == 1 then
     kLfo = 1
 elseif kCombobox == 2 then
@@ -475,23 +475,23 @@ endif
 
 
 
-kfreq chnget "cutofffreq";Henter cutofffreq fra knob 
+kfreq cabbageGetValue "cutofffreq";Henter cutofffreq fra knob 
 
 
 ;Velg av filtersweep, ganges med en eventuell LFO, og filterfrekvens til slutt
-if chnget:k("cutofftoggle") == 1 then
-    if     chnget:k("cutoffmode") == 1 then ;Sweep up (Starter på 0 i cutofffrekvens,   fader opp til høyere)      
-            aOutL moogladder gaFiltL,  (kfreq*gkCutEnv)*kLfo,chnget:k("cutofffres")
-            aOutR moogladder gaFiltR,  (kfreq*gkCutEnv)*kLfo,chnget:k("cutofffres")
-        elseif chnget:k("cutoffmode") == 2 then ;Sweep down (Starter på høy cutofffrekvens, fader ned til lavere)
-            aOutL moogladder gaFiltL,  (10000-(10000-kfreq)*gkCutEnv)*kLfo, chnget:k("cutofffres")
-            aOutR moogladder gaFiltR,  (10000-(10000-kfreq)*gkCutEnv)*kLfo, chnget:k("cutofffres")
-        elseif chnget:k("cutoffmode") == 3 then ;No sweep (AKA skrur av filter envelopen)
-            aOutL moogladder gaFiltL,  (10000-(10000-kfreq))*kLfo,chnget:k("cutofffres")
-            aOutR moogladder gaFiltR,  (10000-(10000-kfreq))*kLfo,chnget:k("cutofffres")
+if cabbageGetValue:k("cutofftoggle") == 1 then
+    if     cabbageGetValue:k("cutoffmode") == 1 then ;Sweep up (Starter på 0 i cutofffrekvens,   fader opp til høyere)      
+            aOutL moogladder gaFiltL,  (kfreq*gkCutEnv)*kLfo,cabbageGetValue:k("cutofffres")
+            aOutR moogladder gaFiltR,  (kfreq*gkCutEnv)*kLfo,cabbageGetValue:k("cutofffres")
+        elseif cabbageGetValue:k("cutoffmode") == 2 then ;Sweep down (Starter på høy cutofffrekvens, fader ned til lavere)
+            aOutL moogladder gaFiltL,  (10000-(10000-kfreq)*gkCutEnv)*kLfo, cabbageGetValue:k("cutofffres")
+            aOutR moogladder gaFiltR,  (10000-(10000-kfreq)*gkCutEnv)*kLfo, cabbageGetValue:k("cutofffres")
+        elseif cabbageGetValue:k("cutoffmode") == 3 then ;No sweep (AKA skrur av filter envelopen)
+            aOutL moogladder gaFiltL,  (10000-(10000-kfreq))*kLfo,cabbageGetValue:k("cutofffres")
+            aOutR moogladder gaFiltR,  (10000-(10000-kfreq))*kLfo,cabbageGetValue:k("cutofffres")
     endif
     
-  elseif chnget:k("cutofftoggle") == 0 then ;Ignorerer filteret hvis cutoff er skrudd av
+  elseif cabbageGetValue:k("cutofftoggle") == 0 then ;Ignorerer filteret hvis cutoff er skrudd av
     aOutL = gaFiltL
     aOutR = gaFiltR
 endif
@@ -508,8 +508,8 @@ endin
 ;Valg av waveform -----------------
 instr WAVEFORMSELECT
 
-    kCombobox1 chnget "vcoselect1"
-    kCombobox2 chnget "vcoselect2"
+    kCombobox1 cabbageGetValue "vcoselect1"
+    kCombobox2 cabbageGetValue "vcoselect2"
 
    ;Oscil 1 waveform
     if kCombobox1 == 1 then ;Konverterer combobox verdien til passende imode verdier til vco2 opkoden
